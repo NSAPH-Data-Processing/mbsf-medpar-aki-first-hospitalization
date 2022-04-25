@@ -1,7 +1,6 @@
 import pandas as pd
 import dask.dataframe as dd
 from dask.dataframe import from_pandas
-from dask.distributed import Client, LocalCluster, TimeoutError
 import numpy as np
 import sys
 import json
@@ -16,8 +15,8 @@ def get_outcomes():
 
 
 def read_admissions(year):
+    # read dataset
     admissions_path = "data/medpar/medpar_" + str(year) + ".csv"
-    #admissions_path = "data/medpar/medpar_20TEMP.csv"
     admissions_ = pd.read_csv(admissions_path)
     admissions_['ADATE'] = pd.to_datetime(admissions_['ADATE'], format='%d%b%Y')
     admissions_['DDATE'] = pd.to_datetime(admissions_['DDATE'], format='%d%b%Y')
@@ -25,6 +24,7 @@ def read_admissions(year):
 
 
 def primary(row, outcome=None):
+    """ Get primary diagnosis from DIAG1 """
     if row["DIAG1"] in outcomes[outcome]["icd9"] and \
             row["DDATE"] < icd_date:
         return True 
@@ -63,12 +63,6 @@ if __name__ == '__main__':
     year_ = 2000 + int(arg)  
     print(datetime.datetime.now())
     print(year_)
-    cluster = LocalCluster()
-
-    try:
-        client = Client(cluster, timeout='2s')
-    except TimeoutError:
-        pass
         
     admissions = read_admissions(year_)
 
@@ -90,9 +84,6 @@ if __name__ == '__main__':
     diag_cols = ["DIAG" + str(num) for num in range(1, 11)]
     admissions = admissions.drop(columns=diag_cols)
     print(datetime.datetime.now())
-    print("dropped diags")
 
-    admissions.to_csv("data/medpar_vars/medpar_"+str(year_)+".csv", index=False, single_file=True)
-    if client:
-        client.close()
+    admissions.to_csv("data/medpar_vars/medpar_n"+str(year_)+".csv", index=False, single_file=True)
 

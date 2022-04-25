@@ -1,5 +1,6 @@
 import pandas as pd
 import glob
+import dask.dataframe as dd
 from dask.dataframe import from_pandas
 from dask.distributed import Client, LocalCluster, TimeoutError
 import numpy as np
@@ -29,17 +30,20 @@ def is_aki_secondary(df):
 outcomes = get_outcomes()
 
 if __name__ == '__main__':
-    cluster = LocalCluster()
 
-    try:
-        client = Client(cluster, timeout='2s')
-    except TimeoutError:
-        pass
-
-    admissions = pd.concat(map(pd.read_csv, glob.glob('data/medpar_vars/medpar_a*.csv')))
+    all_files = glob.glob('data/medpar_vars/medpar_n20*.csv')
+    
+    li = []
+    
+    for filename in all_files:
+        df = pd.read_csv(filename, index_col=None, header=0)
+        li.append(df)
+    
+    admissions = pd.concat(li, axis=0, ignore_index=True)
+    #dd.read_csv('data/medpar_vars/medpar_a*.csv') #
     admissions['ADATE'] = pd.to_datetime(admissions['ADATE'])
     admissions_len = len(admissions)
-    admissions = from_pandas(admissions, npartitions=2)
+    admissions = from_pandas(admissions, npartitions=30)
 
     first_hosp_dict = dict()
 
@@ -71,10 +75,10 @@ if __name__ == '__main__':
 
     # add primary and secondary so that only the first diag counts
     for outcome in outcomes:
-        ind_list = admissions[admissions[outcome + "_primary"]==1].\
+        ind_list = admissions[admissions[outcome + "_primary"]].\
             groupby('QID')['ADATE'].idxmin().compute()
         first_hosp_dict[outcome + "_primary_first_hosp"] = ind_list
-        ind_list = admissions[admissions[outcome + "_secondary"]==1]. \
+        ind_list = admissions[admissions[outcome + "_secondary"]]. \
             groupby('QID')['ADATE'].idxmin().compute()
         first_hosp_dict[outcome + "_secondary_first_hosp"] = ind_list
 
@@ -86,7 +90,5 @@ if __name__ == '__main__':
         # append to df
         admissions[col_name] = temp
 
-    admissions.to_csv("data/medpar_all/medpar_.csv", index=False, single_file=True)
+    admissions.to_csv("data/medpar_all/medpar.csv", index=False, single_file=True)
 
-    if client:
-        client.close()
