@@ -18,7 +18,7 @@ if __name__ == '__main__':
     df_enr['dual']=df_enr['dual'].astype(int)
     df_enr['follow_up']=df_enr['follow_up'].astype(int)
 
-    df = df_enr.merge(df_conf, how='outer', on=['year', 'zip'])
+    df = df_enr.merge(df_conf, how='left', on=['year', 'zip'])
 
     # reorder cols:
     cols = ["year", "zip", "race", "sex", "dual", "follow_up", "entry_age_group",

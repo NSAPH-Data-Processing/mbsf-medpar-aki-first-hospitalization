@@ -4,19 +4,19 @@
 job_directory=$PWD/.job
 
 
-for i in {0..16}; do
+for i in {1..16}; do
 
     job_file="${job_directory}/job${i}.job"
 
     echo "#!/bin/bash
-#SBATCH --job-name=job${i}.job
-#SBATCH --output=.out/${i}_.out
-#SBATCH --error=.out/${i}_.err
-#SBATCH -c 8 
-#SBATCH --time=3-00:00
-#SBATCH --mem=22000
-#SBATCH --qos=normal
+#SBATCH --job-name=job${i}n.job
+#SBATCH --output=.out/${i}n_.out
+#SBATCH --error=.out/${i}n_.err
 #SBATCH -p serial_requeue 
+#SBATCH -n 10
+#SBATCH --time=3-00:00
+#SBATCH --mem-per-cpu=5GB
+#SBATCH --qos=normal
 module load python/3.8.5-fasrc01
 python src/add_diag_vars.py ${i}" > $job_file 
     sbatch $job_file  
