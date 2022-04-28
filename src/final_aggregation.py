@@ -62,7 +62,7 @@ if __name__ == '__main__':
     li = []
     for year in range(2000, 2017):
         filename = "data/mbsf_conf/mbsf_conf" + str(year) + ".csv"
-        mbsf_ = pd.read_csv(filename, nrows=1000, index_col=None, header=0)
+        mbsf_ = pd.read_csv(filename, index_col=None, header=0)
         li.append(mbsf_)
 
     mbsf = pd.concat(li, axis=0, ignore_index=True)

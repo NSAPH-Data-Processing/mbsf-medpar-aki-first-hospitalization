@@ -8,7 +8,6 @@ get_icd.R
 confounders_to_csv.R
 mbsf_to_csv.R
 medpar_to_csv.R
-
 ```
 
 Get primary and secondary diagnosis:
