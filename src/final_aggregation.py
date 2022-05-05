@@ -2,10 +2,14 @@ import pandas as pd
 import json
 
 hospitalized = set()
-hosp = pd.DataFrame()
 
 
-def denom(x):
+def reset_hospitalized():
+    global hospitalized
+    hospitalized.clear()
+
+
+def denom(x, hosp=None):
     group = (
         x['year'], x['sex'], x.race,
         x['zip'], x.dual, x.follow_up,
@@ -68,17 +72,17 @@ if __name__ == '__main__':
     mbsf = pd.concat(li, axis=0, ignore_index=True)
 
     for d in co_morbidity:
-        hospitalized = set()
-        hosp = df[df[d + '_primary_aki_secondary_first_hosp']].groupby(strata)['QID'].apply(list)
+        reset_hospitalized()
+        hosp = df[df[d + '_primary_aki_secondary_first_hosp'] == True].groupby(strata)['QID'].apply(list)
         mbsf[d + '_primary_aki_secondary_first_hosp_denom'] = \
-            mbsf.apply(denom, axis=1)
+            mbsf.apply(denom, hosp=hosp, axis=1)
 
-    hospitalized = set()
-    hosp = df[df['diabeteshosp_prior_aki']].groupby(strata)['QID'].apply(list)
-    mbsf['diabeteshosp_prior_aki_denom'] = mbsf.apply(denom, axis=1)
-    hospitalized = set()
-    hosp = df[df['diabeteshosp_prior_aki']].groupby(strata)['QID'].apply(list)
-    mbsf['diabeteshosp_prior_aki_denom'] = mbsf.apply(denom, axis=1)
+    reset_hospitalized()
+    hosp = df[df['diabeteshosp_prior_aki'] == True].groupby(strata)['QID'].apply(list)
+    mbsf['diabeteshosp_prior_aki_denom'] = mbsf.apply(denom, hosp=hosp, axis=1)
+    reset_hospitalized()
+    hosp = df[df['diabeteshosp_prior_aki'] == True].groupby(strata)['QID'].apply(list)
+    mbsf['diabeteshosp_prior_aki_denom'] = mbsf.apply(denom, hosp=hosp, axis=1)
 
     mbsf = mbsf.drop(columns=["ids"])
     df = df.drop(columns=["QID"])
@@ -90,6 +94,6 @@ if __name__ == '__main__':
 
     # merge on strata
     f = mbsf.join(df)
-    f.reset_index().to_csv("data/final.csv")
+    f.reset_index().to_csv("data/final.csv", index=False)
 
 
