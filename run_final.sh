@@ -17,8 +17,10 @@ for i in {0..0}; do
 #SBATCH --mem=350GB
 #SBATCH --qos=normal
 #SBATCH -p serial_requeue 
+#SBATCH --mail-type=END
+#SBATCH --mail-user=anatrisovic@g.harvard.edu
 module load python/3.8.5-fasrc01
-python src/final_aggregation.py" > $job_file 
+python src/aggregation.py" > $job_file 
     sbatch $job_file  
 
 
