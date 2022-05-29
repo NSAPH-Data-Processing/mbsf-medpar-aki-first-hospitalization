@@ -93,9 +93,10 @@ if __name__ == '__main__':
     reset_hospitalized()
     hosp = df[df['diabeteshosp_prior_aki'] == True].groupby('year')['QID'].apply(list)
     mbsf['diabeteshosp_prior_aki_denom'] = mbsf.apply(denom, hosp=hosp, axis=1)
+
     reset_hospitalized()
-    hosp = df[df['diabeteshosp_prior_aki'] == True].groupby('year')['QID'].apply(list)
-    mbsf['diabeteshosp_prior_aki_denom'] = mbsf.apply(denom, hosp=hosp, axis=1)
+    hosp = df[df['ckdhosp_prior_aki'] == True].groupby('year')['QID'].apply(list)
+    mbsf['ckdhosp_prior_aki'] = mbsf.apply(denom, hosp=hosp, axis=1)
     
     mbsf = mbsf.drop(columns=["ids"])
     df = df.drop(columns=["QID"])
