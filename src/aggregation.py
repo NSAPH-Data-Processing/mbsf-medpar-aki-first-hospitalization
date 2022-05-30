@@ -80,8 +80,8 @@ if __name__ == '__main__':
 
     mbsf = pd.concat(li, axis=0, ignore_index=True)
 
-    var_types = {'diabeteshosp_prior_aki':int, 'diabeteshosp_prior_aki':int, 
-             'diabeteshosp_prior_aki_denom':int, 'diabeteshosp_prior_aki_denom':int}
+    var_types = {'diabeteshosp_prior_aki':int, 'ckdhosp_prior_aki':int, 
+             'diabeteshosp_prior_aki_denom':int, 'ckdhosp_prior_aki_denom':int}
     for d in co_morbidity:
         reset_hospitalized()
         hosp = df[df[d + '_primary_aki_secondary_first_hosp'] == True].groupby('year')['QID'].apply(list)
@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
     reset_hospitalized()
     hosp = df[df['ckdhosp_prior_aki'] == True].groupby('year')['QID'].apply(list)
-    mbsf['ckdhosp_prior_aki'] = mbsf.apply(denom, hosp=hosp, axis=1)
+    mbsf['ckdhosp_prior_aki_denom'] = mbsf.apply(denom, hosp=hosp, axis=1)
     
     mbsf = mbsf.drop(columns=["ids"])
     df = df.drop(columns=["QID"])
