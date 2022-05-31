@@ -1,5 +1,5 @@
 
-# Readme 
+# Code workflow 
 
 Generate ICD and retrieve relevant data:
 
@@ -26,3 +26,58 @@ Final aggregation:
 ```
 final_aggregation.py        
 ```
+
+# Output dataset dictionary 
+
+| Column_name        | Source               | Description                                                           |
+|--------------------|----------------------|-----------------------------------------------------------------------|
+| year               | MBSF                 | Year of enrollment.                                                   |
+| sex                | MBSF                 | Beneficiary sex.                                                      |
+| race               | MBSF                 | Beneficiary race.                                                     |
+| zip                | MBSF                 | ZIP code                                                              |
+| dual               | MBSF                 | Should be only 1.                                                     |
+| follow_up          | Computed from MBSF   | Follow-up year.                                                       |
+| entry_age_group    | Computed from MBSF   | Entry age group.                                                      |
+| diabeteshosp_prior_aki | Computed from MedPar | |
+| diabeteshosp_prior_aki_denom | Computed from MedPar | |
+| ckdhosp_prior_aki | Computed from MedPar | |
+| ckdhosp_prior_aki_denom | Computed from MedPar | |
+| diabetes_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| diabetes_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
+| csd_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| csd_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
+| ihd_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| ihd_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
+| pneumonia_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| pneumonia_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
+| hf_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| hf_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
+| ami_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| ami_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
+| cerd_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| cerd_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
+| uti_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| uti_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
+| zcta               | Census               | Annual value.                                                         |
+| poverty            | Census               | Annual value.                                                         |
+| popdensity         | Census               | Annual value.                                                         |
+| medianhousevalue   | Census               | Annual value.                                                         |
+| pct_blk            | Census               | Annual value.                                                         |
+| medhouseholdincome | Census               | Annual value.                                                         |
+| pct_owner_occ      | Census               | Annual value.                                                         |
+| hispanic           | Census               | Annual value.                                                         |
+| education          | Census               | Annual value.                                                         |
+| population         | Census               | Annual value.                                                         |
+| pct_asian          | Census               | Annual value.                                                         |
+| pct_native         | Census               | Annual value.                                                         |
+| pct_white          | Census               | Annual value.                                                         |
+| smoke_rate         | BRFSS                |                                                                       |
+| mean_bmi           | BRFSS                |                                                                       |
+| pm25.current_year | Exposure | |
+| ozone.current_year | Exposure | |
+| no2.current_year | Exposure | |
+| ozone_summer.current_year | Exposure | |
+| pm25.one_year_lag | Exposure | |
+| ozone.one_year_lag | Exposure | |
+| no2.one_year_lag | Exposure | |
+| ozone_summer.one_year_lag | Exposure | |
