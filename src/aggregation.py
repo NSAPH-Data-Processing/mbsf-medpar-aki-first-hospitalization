@@ -108,7 +108,8 @@ if __name__ == '__main__':
 
     # merge on strata
     f = mbsf.join(df)
-    f = f[var_types.keys()].fillna(0).astype(var_types).reset_index()
+    cols = list(var_types.keys())
+    f[cols] = f[cols].fillna(0).astype(var_types)
+    f = f.reset_index()
     f.to_csv("data/final.csv", index=False)
-
 
