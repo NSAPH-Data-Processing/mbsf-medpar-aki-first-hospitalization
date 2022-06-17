@@ -4,11 +4,9 @@
 job_directory=$PWD/.job
 
 
-for i in {0..0}; do
+job_file="${job_directory}/job${i}.job"
 
-    job_file="${job_directory}/job${i}.job"
-
-    echo "#!/bin/bash
+echo "#!/bin/bash
 #SBATCH --job-name=job${i}.job
 #SBATCH --output=.out/${i}first_hosp.out
 #SBATCH --error=.out/${i}first_hosp.err
@@ -19,8 +17,6 @@ for i in {0..0}; do
 #SBATCH -p serial_requeue 
 module load python/3.8.5-fasrc01
 python src/get_first_hosp.py" > $job_file 
-    sbatch $job_file  
+sbatch $job_file  
 
-
-done
 
