@@ -6,3 +6,4 @@ src/__pycache__/
 .out*
 env/
 *.csv
+dask-worker-space/
