@@ -20,7 +20,6 @@ for i in {0..16}; do
 #SBATCH --mail-type=END
 #SBATCH --mail-user=anatrisovic@g.harvard.edu
 module load python/3.8.5-fasrc01
-pip install fastparquet
 python src/add_diag_vars.py ${i}" > $job_file 
     sbatch $job_file  
 
