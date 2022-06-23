@@ -1,17 +1,11 @@
 """ Calculates denominators and does the final merge. """
 
-import json
 import pandas as pd
+from helpers import get_outcomes
 
-co_morbidity = ["diabetes", "csd", "ihd", "pneumonia", "hf", "ami", "cerd", "uti"]
 strata = ['year', 'sex', 'race', 'zip', 'dual', 'follow_up', 'entry_age_group']
+co_morbidity = ["diabetes", "csd", "ihd", "pneumonia", "hf", "ami", "cerd", "uti"]
 
-def get_outcomes(path=None):
-    """ Get and return ICD codes """""
-    f = open(path+'/icd_codes.json')
-    outcomes_ = json.load(f)
-    f.close()
-    return json.loads(outcomes_[0])
 
 def set_aggregations():
     """ Sets funcs for final aggregation. """
@@ -37,9 +31,6 @@ def set_aggregations():
     agg_dict['aki_primary_secondary_first_hosp'] = ['sum']
     return agg_dict, var_types
 
-def counts(x):
-    """ Counts the number of enrolled per strata. """
-    return len(set(x['ids'].split(", ")))
 
 def add_denominator(name, hosp):
     """ Calculates and merges denominator. """""
@@ -50,15 +41,14 @@ def add_denominator(name, hosp):
         # get hospitalized in prior years
         for y in range(2000, year):
             try:
-                hosp_in_y = hosp[y]
+                hosp_in_year = hosp[y]
                 # filter out if hospitalized in prior years
-                tdf = tdf[~tdf.qid.isin(hosp_in_y)]
+                tdf = tdf[~tdf['qid'].isin(hosp_in_year)]
             except KeyError:
                 pass
-        li.append(tdf.groupby(strata).size().to_frame(name))
+        li.append(tdf.groupby(["year", "qid"]).size().to_frame(name))
 
     denom = pd.concat(li, axis=0)
-    # joins denominator to the main MBSF
     mbsf = mbsf.join(denom)
 
 
@@ -66,27 +56,23 @@ outcomes = get_outcomes(path='src')
 
 # read medPar
 df = pd.read_parquet("data/medpar_all/medpar_sets.parquet")
-df = df.rename(columns={'YEAR': 'year', 'SEX': 'sex', 'RACE': 'race', 'Dual': 'dual', 'ZIP': 'zip'})
+df = df.drop(columns=['SEX', 'RACE', 'ADATE', 'ZIP', 'Dual',
+       'follow_up', 'entry_age_group'])
+df = df.rename(columns={'YEAR': 'year'})
 
-# read stratified MBSF
-li = []
-for year in range(2000, 2017):
-    file_name = "data/mbsf_conf/mbsf_conf" + str(year) + ".csv"
-    mbsf_ = pd.read_csv(file_name, index_col=None, header=0)
-    li.append(mbsf_)
-mbsf = pd.concat(li, axis=0, ignore_index=True)
-mbsf['total'] = mbsf.apply(counts, axis=1)
-
-# MBSF here is already groupped so this will just create the index
-mbsf = mbsf.groupby(strata).first()
-mbsf = mbsf.drop(columns=["ids"])
-
-# read individual MBSF
+# read MBSF
 mbsf_dict = {}
+li = []
+
 for year in range(2001, 2017):
     filename = "data/denom/qid_denom_" + str(year) + ".csv"
     mbsf_dict[year] = pd.read_csv(filename, index_col=None)
-
+    li.append(mbsf_dict[year])
+    
+mbsf = pd.concat(li, axis=0, ignore_index=True)
+mbsf = mbsf.groupby(["year", "qid"]).first()
+    
+    
 # calculate denominators
 for d in co_morbidity:
     add_denominator(
@@ -116,16 +102,20 @@ add_denominator(
 
 # aggregate mbsf and medpar
 agg_dict, var_types = set_aggregations()
-df = df.drop(columns=["QID"])
-df = df.groupby(strata).agg(agg_dict)
-df.columns = df.columns.droplevel(1)
 
-# merge on strata
+
+df = df.rename(columns={'QID': 'qid'})
+df = df.groupby(["year", "qid"]).sum()
+
 f = mbsf.join(df)
-
 cols = list(var_types.keys())
 f[cols] = f[cols].fillna(0).astype(var_types)
 f = f.reset_index()
 
-f.to_csv("data/final_no_dask.csv", index=False)
+f = f.drop(columns=["qid"])
+f = f.groupby(strata).agg(agg_dict)
+f.columns = f.columns.droplevel(1)
+f = f.reset_index()
+
+f.to_csv("data/final.csv", index=False)
 
