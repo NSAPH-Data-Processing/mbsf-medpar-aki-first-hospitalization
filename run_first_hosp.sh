@@ -18,6 +18,5 @@ echo "#!/bin/bash
 #SBATCH --mail-type=END
 #SBATCH --mail-user=anatrisovic@g.harvard.edu
 module load python/3.8.5-fasrc01
-pip install fastparquet
 python src/get_first_hosp.py" > $job_file 
-sbatch --begin=now+4hour $job_file  
+sbatch $job_file  

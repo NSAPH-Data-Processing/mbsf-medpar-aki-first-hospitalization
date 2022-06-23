@@ -65,7 +65,7 @@ def add_denominator(name, hosp):
 outcomes = get_outcomes(path='src')
 
 # read medPar
-df = pd.read_parquet("data/medpar_all/medpar.parquet")
+df = pd.read_parquet("data/medpar_all/medpar_sets.parquet")
 df = df.rename(columns={'YEAR': 'year', 'SEX': 'sex', 'RACE': 'race', 'Dual': 'dual', 'ZIP': 'zip'})
 
 # read stratified MBSF

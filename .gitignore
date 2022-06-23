@@ -1,9 +1,12 @@
 data/*/*.csv
 data/*.csv
+data/*
 src/__pycache__/
 *.ipynb_checkpoints/
+*.swp
 .job*
 .out*
 env/
+.env/
 *.csv
 dask-worker-space/

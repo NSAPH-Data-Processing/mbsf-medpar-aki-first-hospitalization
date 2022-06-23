@@ -31,8 +31,8 @@ co_morbidity = ["diabetes", "csd", "ihd", "pneumonia", "hf", "ami", "cerd", "uti
 if __name__ == '__main__':
     li = []
     for year in range(2000, 2017):
-        filename = "data/medpar_vars/medpar_" + str(year) + ".parquet"
-        df = pd.read_parquet(filename, index_col=None, header=0)
+        filename = "data/medpar_vars/medpar_" + str(year) + "_sets.parquet"
+        df = pd.read_parquet(filename)
         li.append(df)
 
     admissions = pd.concat(li, axis=0, ignore_index=True)
@@ -86,4 +86,4 @@ if __name__ == '__main__':
         # append to df
         admissions[col_name] = temp
         
-    admissions.to_parquet('data/medpar_all/medpar.parquet', index=False)
+    admissions.to_parquet('data/medpar_all/medpar_sets.parquet', index=False)
