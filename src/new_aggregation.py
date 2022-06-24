@@ -13,7 +13,7 @@ def add_denominator(name, hosp):
         for y in range(2000, year):
             try:
                 mbsf[name] = ~(mbsf['qid'].isin(hosp[y]) & \
-                    (mbsf['year']==y)) & \
+                    (mbsf['year']==year)) & \
                     mbsf[name]
             except KeyError:
                 pass
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     
     # read MBSF
     li = []
-    for year in range(2001, 2017):
+    for year in range(2000, 2017):
         filename = "data/denom/qid_denom_" + str(year) + ".csv"
         mbsf_loc = pd.read_csv(filename)
         li.append(mbsf_loc)
@@ -94,4 +94,4 @@ if __name__ == '__main__':
     
     mbsf = mbsf.join(confounders, on=['year', 'zip'])
 
-    mbsf.to_csv("data/final0624.csv") 
+    mbsf.to_csv("data/final.csv") 
