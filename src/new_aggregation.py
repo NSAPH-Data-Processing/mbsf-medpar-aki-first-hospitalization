@@ -3,119 +3,95 @@
 import pandas as pd
 from helpers import get_outcomes
 
-strata = ['year', 'sex', 'race', 'zip', 'dual', 'follow_up', 'entry_age_group']
-co_morbidity = ["diabetes", "csd", "ihd", "pneumonia", "hf", "ami", "cerd", "uti"]
-
-
-def set_aggregations():
-    """ Sets funcs for final aggregation. """
-    agg_dict = {}
-    global df
-    for outcome in outcomes:
-        agg_dict[outcome + "_primary_first_hosp"] = ["sum"]
-        agg_dict[outcome + "_secondary_first_hosp"] = ["sum"]
-
-    var_types = {'diabeteshosp_prior_aki':int, 'ckdhosp_prior_aki':int,
-         'diabeteshosp_prior_aki_denom':int, 'ckdhosp_prior_aki_denom':int,
-         'aki_primary_secondary_denom':int, 'aki_primary_secondary_first_hosp':int}
-    
-    for d in co_morbidity:
-        df = df.drop(columns=[d + "_primary_aki_secondary"])
-        agg_dict[d + '_primary_aki_secondary_first_hosp'] = ['sum']
-        var_types[d + '_primary_aki_secondary_first_hosp']=int
-        var_types[d + '_primary_aki_secondary_first_hosp_denom']=int
-
-    agg_dict['diabeteshosp_prior_aki'] = ['sum']
-    agg_dict['ckdhosp_prior_aki'] = ['sum']
-    agg_dict['aki_primary_secondary'] = ['sum']
-    agg_dict['aki_primary_secondary_first_hosp'] = ['sum']
-    return agg_dict, var_types
-
 
 def add_denominator(name, hosp):
     """ Calculates and merges denominator. """""
-    li = []
     global mbsf
+    mbsf[name] = True
     for year in range(2001, 2017):
-        tdf = mbsf_dict[year]
-        # get hospitalized in prior years
+        # remove hospitalized in prior years
         for y in range(2000, year):
             try:
-                hosp_in_year = hosp[y]
-                # filter out if hospitalized in prior years
-                tdf = tdf[~tdf['qid'].isin(hosp_in_year)]
+                mbsf[name] = ~(mbsf['qid'].isin(hosp[y]) & \
+                    (mbsf['year']==y)) & \
+                    mbsf[name]
             except KeyError:
                 pass
-        li.append(tdf.groupby(["year", "qid"]).size().to_frame(name))
-
-    denom = pd.concat(li, axis=0)
-    mbsf = mbsf.join(denom)
 
 
-outcomes = get_outcomes(path='src')
+def get_fin_vars():
+    co_morbidity = ["diabetes", "csd", "ihd", "pneumonia", \
+                    "hf", "ami", "cerd", "uti"]
+    fin_vars_loc = [ 'aki_primary_secondary_first_hosp', \
+            'ckdhosp_prior_aki', 'diabeteshosp_prior_aki']
+    for mvar in co_morbidity:
+        name = mvar + '_primary_aki_secondary_first_hosp'
+        fin_vars_loc.append(name)
+    return fin_vars_loc
 
-# read medPar
-df = pd.read_parquet("data/medpar_all/medpar_sets.parquet")
-df = df.drop(columns=['SEX', 'RACE', 'ADATE', 'ZIP', 'Dual',
-       'follow_up', 'entry_age_group'])
-df = df.rename(columns={'YEAR': 'year'})
 
-# read MBSF
-mbsf_dict = {}
-li = []
-
-for year in range(2001, 2017):
-    filename = "data/denom/qid_denom_" + str(year) + ".csv"
-    mbsf_dict[year] = pd.read_csv(filename, index_col=None)
-    li.append(mbsf_dict[year])
+if __name__ == '__main__':
     
-mbsf = pd.concat(li, axis=0, ignore_index=True)
-mbsf = mbsf.groupby(["year", "qid"]).first()
+    fin_vars = get_fin_vars()
+    outcomes = get_outcomes(path='src')
+    strata = ['year', 'sex', 'race', 'zip', 'dual', 'follow_up', 'entry_age_group']
     
+
+    # read medPar
+    df = pd.read_parquet("data/medpar_all/medpar_sets.parquet")
+    df = df[['QID', 'YEAR'] + fin_vars]
+    df = df.rename(columns={'YEAR': 'year', 'QID': 'qid'})
+
     
-# calculate denominators
-for d in co_morbidity:
-    add_denominator(
-        name=d+'_primary_aki_secondary_first_hosp_denom',
-        hosp=df[df[d + '_primary_aki_secondary_first_hosp']]
-        .groupby('year')['QID'].apply(list).to_dict()
-    )
-
-# calculate denominators for diabetes and ckd
-add_denominator(
-    name='diabeteshosp_prior_aki_denom',
-    hosp=df[df['diabeteshosp_prior_aki']]
-    .groupby('year')['QID'].apply(list).to_dict()
-)
-add_denominator(
-    name='ckdhosp_prior_aki_denom',
-    hosp=df[df['ckdhosp_prior_aki']]
-    .groupby('year')['QID'].apply(list).to_dict()
-)
-
-# denom for AKI for testing
-add_denominator(
-    name='aki_primary_secondary_denom',
-    hosp=df[df['aki_primary_secondary_first_hosp']]
-    .groupby('year')['QID'].apply(list).to_dict()
-)
-
-# aggregate mbsf and medpar
-agg_dict, var_types = set_aggregations()
+    # read MBSF
+    li = []
+    for year in range(2001, 2017):
+        filename = "data/denom/qid_denom_" + str(year) + ".csv"
+        mbsf_loc = pd.read_csv(filename)
+        li.append(mbsf_loc)
+        
+    mbsf = pd.concat(li, axis=0, ignore_index=True)
+    mbsf = mbsf.drop(mbsf.columns[0], axis=1)
 
 
-df = df.rename(columns={'QID': 'qid'})
-df = df.groupby(["year", "qid"]).sum()
+    # calculate denominators
+    for fin_var in fin_vars:
+        add_denominator(
+            name=fin_var + '_denom',
+            hosp=df[df[fin_var]]
+            .groupby('year')['qid'].apply(list).to_dict()
+        )
+        
+    # set types and aggregations
+    agg_dict = {}
+    var_types = {}
+    for fin_var in fin_vars:
+        agg_dict[fin_var] = ['sum']
+        agg_dict[fin_var + '_denom'] = ['sum']
+        var_types[fin_var] = int
+        var_types[fin_var + '_denom'] = int
 
-f = mbsf.join(df)
-cols = list(var_types.keys())
-f[cols] = f[cols].fillna(0).astype(var_types)
-f = f.reset_index()
+    
+    df = df.groupby(["year", "qid"]).sum()
+    mbsf = mbsf.join(df, on=["year", "qid"])
+    mbsf = mbsf.drop(columns=["qid"])
+    mbsf = mbsf.groupby(strata).agg(agg_dict)
 
-f = f.drop(columns=["qid"])
-f = f.groupby(strata).agg(agg_dict)
-f.columns = f.columns.droplevel(1)
-f = f.reset_index()
+    mbsf.columns = mbsf.columns.droplevel(1)
+    cols = list(var_types.keys())
+    mbsf[cols] = mbsf[cols].fillna(0).astype(var_types)
 
-f.to_csv("data/final.csv", index=False)
+    li = []
+    for year in range(2000, 2017):
+        confounders_path = "data/confounders/merged_confounders_"+ str(year) +".csv"
+        confounders = pd.read_csv(confounders_path)
+        li.append(confounders)
+        
+    confounders = pd.concat(li, axis=0, ignore_index=True)
+    confounders = confounders.drop(confounders.columns[0], axis=1)
+    confounders = confounders.rename(columns={'ZIP': 'zip'})
+    confounders = confounders.set_index(['year','zip'])
+    
+    mbsf = mbsf.join(confounders, on=['year', 'zip'])
 
+    mbsf.to_csv("data/final0624.csv") 
