@@ -21,7 +21,7 @@ outcomes[["glomerular"]][["icd10"]] <- expand_range("N00", "N08")
 # add diabetes 
 outcomes[["diabetes"]] <- list()
 outcomes[["diabetes"]][["icd9"]] <- children("250") 
-outcomes[["diabetes"]][["icd10"]] <- c(children("E08"),children("E09"), children("E10"), children("E11"), children("E12"), children("E13") )
+outcomes[["diabetes"]][["icd10"]] <- c("E08","E09","E10","E11","E12","E13")
 
 #add co-morbidities
 #Circulatory system disease: ICD-9 390-459 / ICD-10 I00-I99
@@ -51,7 +51,7 @@ outcomes[["cerd"]][["icd10"]] <- expand_range("I60", "I69")
 
 #Urinary tract infection: ICD-9 599.0 / ICD-10 N39.0
 outcomes[["uti"]] <- list()
-outcomes[["uti"]][["icd9"]] <- children("599.0")  
-outcomes[["uti"]][["icd10"]] <- children("N39.0")   
+outcomes[["uti"]][["icd9"]] <- children("599")  
+outcomes[["uti"]][["icd10"]] <- children("N39")   
 
 write_json(toJSON(outcomes), "icd_codes.json")
