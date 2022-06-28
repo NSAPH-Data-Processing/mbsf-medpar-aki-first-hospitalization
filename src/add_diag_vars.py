@@ -7,8 +7,6 @@ import json
 import pandas as pd
 import numpy as np
 from helpers import get_outcomes
-import dask.dataframe as dd
-from dask.dataframe import from_pandas
 
 
 def read_admissions(year):
@@ -17,7 +15,7 @@ def read_admissions(year):
     cols = ['QID','ADATE','YEAR','DIAG1','DIAG2','DIAG3','DIAG4', \
             'DIAG5','DIAG6','DIAG7','DIAG8','DIAG9','DIAG10']
     df = pd.read_csv(admissions_path, usecols=cols)
-    return from_pandas(df, npartitions=10)
+    return df
     
 
 def get_outcomes_set(outcome=None):
@@ -28,15 +26,14 @@ def get_outcomes_set(outcome=None):
     else:
         outcomes_set = outcomes[outcome]["icd10"] + \
             outcomes[outcome]["icd9"]
-    return outcomes_set
+    return set(outcomes_set)
 
         
-def get_diags(df, outcome=None, diags=None):
+def get_diags(outcome=None, diags=None, outcomes_set=None):
     """ Get primary diagnosis from DIAG1 """
-    outcomes_set = get_outcomes_set(outcome)
-    return_col = pd.Series([False] * len(df))
+    return_col = pd.Series([False] * len(admissions))
     for col in diags:
-        return_col = return_col | df[col].isin(outcomes_set)
+        return_col = return_col | admissions[col].isin(outcomes_set)
     return return_col
     
 
@@ -51,13 +48,12 @@ if __name__ == '__main__':
     admissions = read_admissions(year)
     
     for outcome in outcomes:
-        admissions[outcome + "_primary"]=admissions.map_partitions(
-            get_diags, outcome=outcome, diags=["DIAG1"], meta=(0,'bool'))
-        admissions[outcome + "_secondary"]=admissions.map_partitions(
-            get_diags, outcome=outcome,diags=secondary_diags, meta=(0,'bool'))
+        outcomes_set = get_outcomes_set(outcome)
+        admissions[outcome + "_primary"]=get_diags(outcome=outcome, 
+            diags=["DIAG1"], outcomes_set=outcomes_set)
+        admissions[outcome + "_secondary"]=get_diags(outcome=outcome,
+            diags=secondary_diags, outcomes_set=outcomes_set)
 
-    admissions = admissions.compute()
-        
     # drop rows that are not of interest
     of_interest_cols = [outcome + "_secondary" for outcome in outcomes]
     of_interest_cols = of_interest_cols + [outcome + "_primary" for outcome in outcomes]
