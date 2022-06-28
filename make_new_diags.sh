@@ -4,17 +4,18 @@
 job_directory=$PWD/.job
 
 
+#for i in {0..0}; do
 for i in {0..16}; do
 
     job_file="${job_directory}/job${i}.job"
 
     echo "#!/bin/bash
-#SBATCH --job-name=make_diags
+#SBATCH --job-name=make_diags${i}
 #SBATCH --output=.out/diag${i}.out
 #SBATCH --error=.out/diag${i}.err
-#SBATCH -c 4
-#SBATCH --time=5-00:00
-#SBATCH --mem=30GB
+#SBATCH -c 12
+#SBATCH --time=1-00:00
+#SBATCH --mem=10GB
 #SBATCH --qos=normal
 #SBATCH -p serial_requeue 
 #SBATCH --mail-type=END
