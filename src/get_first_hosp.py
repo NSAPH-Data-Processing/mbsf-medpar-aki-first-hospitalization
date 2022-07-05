@@ -1,16 +1,8 @@
 """ Finds first diagnosis for all diagnoses of interest. """
 
-import json
 import pandas as pd
 import numpy as np
-
-
-def get_outcomes():
-    """ Get and return ICD codes """""
-    f = open('src/icd_codes.json')
-    outcomes_ = json.load(f)
-    f.close()
-    return json.loads(outcomes_[0])
+from helpers import get_outcomes
 
 
 def is_aki_secondary(df):
@@ -25,7 +17,7 @@ def is_aki_secondary(df):
     return min_ind
 
 
-outcomes = get_outcomes()
+outcomes = get_outcomes("src")
 co_morbidity = ["diabetes", "csd", "ihd", "pneumonia", "hf", "ami", "cerd", "uti"]
 
 if __name__ == '__main__':
