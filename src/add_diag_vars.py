@@ -3,7 +3,6 @@ Identifies diagnoses of interest and adds them as new variables.
 """
 
 import sys
-import json
 import pandas as pd
 import numpy as np
 from helpers import get_outcomes
@@ -29,7 +28,7 @@ def get_outcomes_set(outcome=None):
     return set(outcomes_set)
 
         
-def get_diags(outcome=None, diags=None, outcomes_set=None):
+def get_diags(diags=None, outcomes_set=None):
     """ Get primary diagnosis from DIAG1 """
     return_col = pd.Series([False] * len(admissions))
     for col in diags:
@@ -49,9 +48,9 @@ if __name__ == '__main__':
     
     for outcome in outcomes:
         outcomes_set = get_outcomes_set(outcome)
-        admissions[outcome + "_primary"]=get_diags(outcome=outcome, 
+        admissions[outcome + "_primary"]=get_diags(
             diags=["DIAG1"], outcomes_set=outcomes_set)
-        admissions[outcome + "_secondary"]=get_diags(outcome=outcome,
+        admissions[outcome + "_secondary"]=get_diags(
             diags=secondary_diags, outcomes_set=outcomes_set)
 
     # drop rows that are not of interest
