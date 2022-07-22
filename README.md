@@ -1,4 +1,4 @@
-# First AKI hospitalization (revisions)
+# First hospitalization with AKI and comorbidities in US Medicare data (2000-2016)
 
 ## Data integration workflow 
 
