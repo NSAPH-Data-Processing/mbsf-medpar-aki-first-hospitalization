@@ -1,15 +1,15 @@
 # First AKI hospitalization (revisions)
 
-## Data preparation workflow 
+## Data integration workflow 
 
-The code is located in the `code` directory. Input data is first converted from `.fst` into `.csv` (the code for that is in `code/preq`).
+The code is located in the `code` directory. The input data is first converted from `.fst` into `.csv` (the code for that is in `code/preq`).
 
 The workflow goes as follows:
 
 1. We generate ICD 9/10 codes of interest, in `get_icd.R`
 2. We create new diagnosis variables based on the ICD codes, in `add_diag_vars.py`
 3. We identify first hospitalizations, in `get_first_hosp.py`
-4. Final aggregation and denominators are done in `aggregation.py`
+4. Final aggregation and denominators are computed in `aggregation.py`
 5. Summary file (with denominator counts) is produced in `final_check.py`
 
 Analysis code is deposited in directory `analysis`. The directory `notebooks` contain misc and development files.

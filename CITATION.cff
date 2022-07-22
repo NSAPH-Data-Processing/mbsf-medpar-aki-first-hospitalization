@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Trisovic
+    given-names: Ana
+    orcid: https://orcid.org/0000-0003-1991-0533
+title: First hospitalization with AKI and comorbidities in US Medicare data (2000-2016)
+version: 1.0.0
+date-released: 2022-07-22
