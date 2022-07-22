@@ -33,7 +33,7 @@ The bash scripts call code files from steps 2.-5. The ICD codes from step 1. was
 
 The data diagram shows used data sources:
 
-```
+```mermaid
 flowchart LR
     %% creating nodes
     id1([Data\n Integration])
@@ -41,8 +41,8 @@ flowchart LR
     %% linking nodes
     id2(MBSF -\n enrollment)-->id1
     id3(MedPar -\n hospitalization)-->id1
-    id4((Air Pollution))-->id1
-    id5[(Census \n& BRFSS)]-->id1
+    id4(Exposure -\n PM25, NO2, O3)-->id1
+    id5(Census \n& BRFSS)-->id1
     
     %% integration to warehouse
     id1-->id7[(\n\n Output data \n\n)]
