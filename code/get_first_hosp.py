@@ -17,7 +17,7 @@ def is_aki_secondary(df):
     return min_ind
 
 
-outcomes = get_outcomes("src")
+outcomes = get_outcomes("code")
 co_morbidity = ["diabetes", "csd", "ihd", "pneumonia", "hf", "ami", "cerd", "uti"]
 
 if __name__ == '__main__':

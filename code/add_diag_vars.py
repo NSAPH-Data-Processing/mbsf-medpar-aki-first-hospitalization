@@ -10,12 +10,12 @@ from helpers import get_outcomes
 
 def read_admissions(year):
     """ Reads dataset """
-    admissions_path = "data/medpar/medpar_" + str(year) + ".csv"
+    admissions_path = "data/medpar/medpar2_" + str(year) + ".csv"
     cols = ['QID','ADATE','YEAR','DIAG1','DIAG2','DIAG3','DIAG4', \
             'DIAG5','DIAG6','DIAG7','DIAG8','DIAG9','DIAG10']
     df = pd.read_csv(admissions_path, usecols=cols)
     return df
-    
+
 
 def get_outcomes_set(outcome=None):
     if year < 2015:
@@ -36,7 +36,7 @@ def get_diags(diags=None, outcomes_set=None):
     return return_col
     
 
-outcomes = get_outcomes("src")
+outcomes = get_outcomes("code")
 diags = ["DIAG" + str(num) for num in np.arange(1, 11)]
 secondary_diags = ["DIAG" + str(num) for num in np.arange(2, 11)]
 

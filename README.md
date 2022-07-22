@@ -1,33 +1,55 @@
+# First AKI hospitalization (revisions)
 
-# Code workflow 
+## Data preparation workflow 
 
-Generate ICD and retrieve relevant data:
+The code is located in the `code` directory. Input data is first converted from `.fst` into `.csv` (the code for that is in `code/preq`).
 
-```
-get_icd.R
-confounders_to_csv.R
-mbsf_to_csv.R
-medpar_to_csv.R
-```
+The workflow goes as follows:
 
-Get primary and secondary diagnosis:
-```
-add_diag_vars.py
-```
+1. We generate ICD 9/10 codes of interest, in `get_icd.R`
+2. We create new diagnosis variables based on the ICD codes, in `add_diag_vars.py`
+3. We identify first hospitalizations, in `get_first_hosp.py`
+4. Final aggregation and denominators are done in `aggregation.py`
+5. Summary file (with denominator counts) is produced in `final_check.py`
 
-Get first hospitalizations:
-```
-get_first_hosp.py
-mbsf_confounders_merge.py
-```
+Analysis code is deposited in directory `analysis`. The directory `notebooks` contain misc and development files.
 
-Final aggregation:
+## Run on SLURM
+
+To reproduce the data, run the following commands in the command-line:
 
 ```
-final_aggregation.py        
+sh run_preq.sh
+sh make_diag_vars.sh
+sh find_first_hosp.sh
+sh run_final.sh
 ```
 
-# Output dataset dictionary 
+You can run all of the scripts at once because job dependency is already incorporated in the script.
+
+The bash scripts call code files from steps 2.-5. The ICD codes from step 1. was generated locally.
+
+## Data diagram
+
+The data diagram shows used data sources:
+
+```
+flowchart LR
+    %% creating nodes
+    id1([Data\n Integration])
+    
+    %% linking nodes
+    id2(MBSF -\n enrollment)-->id1
+    id3(MedPar -\n hospitalization)-->id1
+    id4((Air Pollution))-->id1
+    id5[(Census \n& BRFSS)]-->id1
+    
+    %% integration to warehouse
+    id1-->id7[(\n\n Output data \n\n)]
+```
+
+## Output data dictionary 
+
 
 | Column_name        | Source               | Description                                                           |
 |--------------------|----------------------|-----------------------------------------------------------------------|
@@ -61,48 +83,27 @@ final_aggregation.py
 | ozone.one_year_lag | Exposure             | |
 | no2.one_year_lag   | Exposure             | |
 | ozone_summer.one_year_lag | Exposure      | |
-| diabetes_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
-| csd_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
-| ihd_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
-| pneumonia_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
-| hf_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
-| ami_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
-| cerd_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
-| uti_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
-| diabeteshosp_prior_aki_denom | Computed from MedPar | |
-| ckdhosp_prior_aki_denom | Computed from MedPar | |
-| all_kidney_primary_first_hosp | Computed from MedPar | |
-| all_kidney_secondary_first_hosp | Computed from MedPar | |
-| ckd_primary_first_hosp | Computed from MedPar | |
-| ckd_secondary_first_hosp | Computed from MedPar | |
-| aki_primary_first_hosp | Computed from MedPar | |
-| aki_secondary_first_hosp | Computed from MedPar | |
-| glomerular_primary_first_hosp | Computed from MedPar | |
-| glomerular_secondary_first_hosp | Computed from MedPar | |
-| diabetes_primary_first_hosp | Computed from MedPar | |
-| diabetes_secondary_first_hosp | Computed from MedPar | |
-| csd_primary_first_hosp | Computed from MedPar | |
-| csd_secondary_first_hosp | Computed from MedPar | |
-| ihd_primary_first_hosp | Computed from MedPar | |
-| ihd_secondary_first_hosp | Computed from MedPar | |
-| pneumonia_primary_first_hosp | Computed from MedPar | |
-| pneumonia_secondary_first_hosp | Computed from MedPar | |
-| hf_primary_first_hosp | Computed from MedPar | |
-| hf_secondary_first_hosp | Computed from MedPar | |
-| ami_primary_first_hosp | Computed from MedPar | |
-| ami_secondary_first_hosp | Computed from MedPar | |
-| cerd_primary_first_hosp | Computed from MedPar | |
-| cerd_secondary_first_hosp | Computed from MedPar | |
-| uti_primary_first_hosp | Computed from MedPar | |
-| uti_secondary_first_hosp | Computed from MedPar | |
 | diabetes_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| diabetes_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
 | csd_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| csd_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
 | ihd_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| ihd_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
 | pneumonia_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| pneumonia_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
 | hf_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| hf_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
 | ami_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| ami_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
 | cerd_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| cerd_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
 | uti_primary_aki_secondary_first_hosp | Computed from MedPar | |
+| uti_primary_aki_secondary_first_hosp_denom | Computed from MedPar | |
 | diabeteshosp_prior_aki | Computed from MedPar | |
+| diabeteshosp_prior_aki_denom | Computed from MedPar | |
 | ckdhosp_prior_aki | Computed from MedPar | |
+| ckdhosp_prior_aki_denom | Computed from MedPar | |
+| aki_primary_secondary_first_hosp | Computed from MedPar | |
+| aki_primary_secondary_denom | Computed from MedPar | |
+
 

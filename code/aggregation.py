@@ -33,7 +33,7 @@ def get_fin_vars():
 if __name__ == '__main__':
     
     fin_vars = get_fin_vars()
-    outcomes = get_outcomes(path='src')
+    outcomes = get_outcomes(path='code')
     strata = ['year', 'sex', 'race', 'zip', 'dual', 'follow_up', 'entry_age_group']
     
 
@@ -94,4 +94,4 @@ if __name__ == '__main__':
     
     mbsf = mbsf.join(confounders, on=['year', 'zip'])
 
-    mbsf.to_csv("data/final.csv") 
+    mbsf.to_csv("data/final_backup.csv") 
