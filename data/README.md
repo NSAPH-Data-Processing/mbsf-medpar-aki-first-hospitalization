@@ -16,7 +16,7 @@ ln -s /n/dominici_nsaph_l3/projects/analytic/admissions_by_year .
 
 ```
 ln -s /n/dominici_nsaph_l3/projects/analytic/medicare_entry_age/ .
-ln -s /n/dominici_nsaph_l3/projects/analytic/follow_up_year/ .
+ln -s /n/dominici_nsaph_l3/projects/analytic/years_in_medicare/ .
 ```
 
 ## Confounders and exposures

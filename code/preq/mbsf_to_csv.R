@@ -22,7 +22,7 @@ denom_data <- filter(denom_data, hmo_mo==0)
 
 entry_age <- read.fst("data/medicare_entry_age/medicare_entry_age.fst", as.data.table = T)  
 
-follow_up_path <- paste("data/follow_up_year/follow_up_year_", year_, ".fst", sep="")
+follow_up_path <- paste("data/years_in_medicare/follow_up_year_", year_, ".fst", sep="")
 follow_up_path <- gsub(" ", "", follow_up_path)
 follow_up_year <- read_fst(follow_up_path, columns = c("qid",
                                                      "year",
