@@ -94,4 +94,4 @@ if __name__ == '__main__':
     
     mbsf = mbsf.join(confounders, on=['year', 'zip'])
 
-    mbsf.to_csv("data/final_backup.csv") 
+    mbsf.to_csv("data/final.csv") 
